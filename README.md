@@ -1,6 +1,6 @@
 # PHP-PDO
 Clase PDO para MySQL
-## Configuración previa
+## Configuración previa (a,b,c)
 
 ### a. El archivo de credenciales
 
@@ -11,6 +11,13 @@ Clase PDO para MySQL
 
 ### b. El archivo de conexión
 Copiar el archivo [DbPDO.class.php](https://github.com/padrecedano/PHP-PDO/blob/master/DbPDO.class.php) en la carpeta que deseemos. Generalmente se suele tener una carpeta dedicada a las clases. Es más fácil luego cargarlas con Autoloader.</p>
+
+### c. El archivo log para escribir las excepciones
+La clase incluye un archivo log en el cual se escribirán las excepciones. Es necesario pues copiar el archivo [DbLog.class.php](https://github.com/padrecedano/PHP-PDO/blob/master/DbLog.class.php) en la misma carpeta en que copiamos el archivo de conexión.
+
+**Nota:** Si por algún motivo no se quiere verificar las posibles excepciones o hacerlo directamente en el log de PHP, la clase se puede modificar.
+
+
 
 ## 2. Modo y ejemplos de uso
 ### a. Incluir el archivo y crear una nueva instancia
