@@ -2,12 +2,12 @@
 Clase PDO para MySQL
 ## Configuración previa (a,b,c)
 
-### a. El archivo de credenciales
+### a1. El archivo de credenciales
 
 - **Crear un archivo `bd.php.ini` en una carpeta fuera del root**. En este caso se usa una carpeta llamada `.credenciales`, situada fuera del root (para que no se pueda acceder al archivo por url, aunque de todos modos el archivo no muestra nada).
 - Copiar en ese archivo el contenido de: [db.php.ini](https://github.com/padrecedano/PHP-PDO/blob/master/db.php.ini) y actualizarlo con las credenciales propias. La primera línea es para evitar que, en caso de que alguien pueda acceder al archivo por url, no muestre nada. Aunque es imposible acceder, porque estaría fuera del root. Si la contraseña de la base de datos contiene caracteres como comillas simples u otros, debe ponerse entre comillas, de lo contrario habrá conflictos a la hora de autentificar. No dejar espacios entre los signos de =
 
-**Nota:** Este es un nivel de seguridad suplementario. Si no se quiere usar, es posible simplemente editar el archivo de la clase DbPDO y poner las credenciales de conexión directamente.
+**a2.** Si no se quiere usar un archivo de credenciales porque parece complicado puedes usar como archivo de conexión el archivo [DbPDOSimple.class.php](https://github.com/padrecedano/PHP-PDO/blob/master/DbPDOSimple.class.php) colocando en él las credenciales y llamándole `DbPDO.class.php` (aquí le ha llamado `DbPDOSimple.class.php` para evitar conflictos con el archivo original (explicado en el punto b.). Si te decides por la opción a2, copia en tu servidor el contenido del archivo `DbPDOSimple.class.php` en un archivo llamado `DbPDO.class.php`, escribe tus credenciales de conexión en la parte indicada y pasa el punto (c).
 
 ### b. El archivo de conexión
 Copiar el archivo [DbPDO.class.php](https://github.com/padrecedano/PHP-PDO/blob/master/DbPDO.class.php) en la carpeta que deseemos. Generalmente se suele tener una carpeta dedicada a las clases. Es más fácil luego cargarlas con Autoloader.</p>
