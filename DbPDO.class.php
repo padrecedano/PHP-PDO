@@ -52,7 +52,7 @@ class DbPDO
      */
     private function Conectar()
     {
-        $this->credenciales = parse_ini_file("//home3/deiverbu/.credentials/db.php.ini");
+        $this->credenciales = parse_ini_file("//.credentials/db.php.ini");
         $dsn            = 'mysql:dbname=' . $this->credenciales["dbnombre"] . ';host=' . $this->credenciales["host"] . '';
         try {
             # Leer credenciales desde el  archivo ini, set UTF8
