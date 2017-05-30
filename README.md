@@ -1,6 +1,6 @@
 # PHP-PDO
 Clase PDO para MySQL
-## Configuración previa (a,b,c)
+## 1. Configuración previa (a y b)
 
 ### a1. El archivo de credenciales
 
@@ -11,12 +11,6 @@ Clase PDO para MySQL
 
 ### b. El archivo de conexión
 Copiar el archivo [DbPDO.class.php](https://github.com/padrecedano/PHP-PDO/blob/master/DbPDO.class.php) en la carpeta que deseemos. Generalmente se suele tener una carpeta dedicada a las clases. Es más fácil luego cargarlas con Autoloader.</p>
-
-### c. El archivo log para escribir las excepciones
-La clase incluye un archivo log en el cual se escribirán las excepciones. Es necesario pues copiar el archivo [DbLog.class.php](https://github.com/padrecedano/PHP-PDO/blob/master/DbLog.class.php) en la misma carpeta en que copiamos el archivo de conexión.
-
-**Nota:** Si por algún motivo no se quiere verificar las posibles excepciones o hacerlo directamente en el log de PHP, la clase se puede modificar.
-
 
 
 ## 2. Modo y ejemplos de uso
@@ -30,18 +24,18 @@ $mipdo=new DbPDO();
 ### b. Usar los métodos de la clase
 La clase tiene los métodos principales para los que necesitamos acceder a la base de datos. Se usan además consultas preparadas que previenen de la Inyección SQL.
 
-#### Consulta general, sin filtros WHERE
+#### b1. Consulta general, sin filtros WHERE
 
 ```php
-$datos = $mipdo->query("SELECT * FROM tabla");
+$datos = $mipdo->query("SELECT * FROM padres");
 
 ```
 
-#### Consulta particular, con filtros WHERE
+#### b2. Consulta particular, con filtros WHERE
 
 Por lo general necesitamos aplicar filtros a las consultas. Un grave peligro es la Inyección SQL. Para prevenirla se recomienda usar consultas preparadas que envían separados la consulta y los datos del filtro. La clase proporciona varias formas de hacer esto.
 
-**_A. Haciendo el binding uno por uno:_**
+**_a. Haciendo el binding uno por uno:_**
 
 ```php
 $mipdo->bind("idprovincia","1");
@@ -50,15 +44,15 @@ $datos=$db->query("SELECT * FROM tabla WHERE id_provincia = :idprovincia AND id_
 
 ```
 
-**_B. Haciendo el binding mediante el método bindMas:_**
+**_b. Haciendo el binding mediante el método bindMas:_**
 
 Nótese que la consulta aquí no cambia, sólo la forma de hacer el binding.
 ```php
 $mipdo->bindMas(array("id_provincia"=>"1","id_estado"=>"5"));
-$datos=$db->query("SELECT * FROM tabla WHERE id_provincia = :idprovincia AND id_estado = :idestado");
+$datos=$mipdo->query("SELECT * FROM tabla WHERE id_provincia = :idprovincia AND id_estado = :idestado");
 ```
 
-**_C. Enviando el binding directamente al método:_**
+**_c. Enviando el binding directamente al método:_**
 
 La SQL y los parámetros van por separado, aunque son enviados con una sola llamada al método
 
@@ -70,36 +64,89 @@ $datos=$mipdo->query(
 
 ```
 
-### Tipos de resultado
+### c. Tipos de resultado obtenidos
 
 #### _a. Arreglo asociativo_
 
 La clase devuelve por defecto un arreglo asociativo con el conjunto de los datos. Es quizá la forma más práctica, de todos modos la clase se puede modificar creando métodos que devuelvan los datos como nosotros los querramos.
 
-En un código como éste, tendremos en la variable `$datos` un arreglo asociativo con los datos de la tabla que cumplan el criterio.
+En un código como éste (y en cualquier consulta SELECT con o sin parámetros), tendremos en la variable `$datos` un arreglo asociativo con los datos de la tabla que cumplan el criterio.
 
 ```php
-$datos=$mipdo->query(
-                   "SELECT * FROM tabla WHERE id_provincia = :idprovincia AND id_estado = :idestado",
-                   array("id_provincia"=>"1","id_estado"=>"5")
-                  );
+$datos=$mipdo->query("SELECT * FROM padres;");
 
 ```
+
+_Resultado almacenado en la variable `$datos` usando `print_r()`_
+```php
+Array
+(
+    [0] => Array
+        (
+            [id_padre] => 1
+            [padre] => Juan Crisóstomo
+            [id_grupo] => 1
+        )
+
+    [1] => Array
+        (
+            [id_padre] => 2
+            [padre] => Agustín
+            [id_grupo] => 1
+        )
+
+    [2] => Array
+        (
+            [id_padre] => 3
+            [padre] => Teofilacto
+            [id_grupo] => 1
+        )
+
+)
+```
+_Resultado almacenado en la variable `$datos` representado en una tabla_
+
+<table><th>id_padre</th><th>padre</th><th>id_grupo</th><tr><td>1</td><td>Juan Crisóstomo</td><td>1</td></tr><tr><td>2</td><td>Agustín</td><td>1</td></tr><tr><td>3</td><td>Teofilacto</td><td>1</td></tr></table>
 
 #### _b. Una columna en específico_
+Si queremos obtener un columna en específico, podríamos enviar una consulta como esta. Como hemos dicho antes, se pueden pasar en una sola llamada, mediante el método `column` tanto la instrucción SQL como los parámetros. El hecho de que se pasen en una sola llamada, no significa que se pasen juntos, la clase se encarga de separarlos, para cumplir con los criterios de consultas preparadas.
 
 ```php
-$columna=$mipdo->column("SELECT columna FROM tabla");
+$columna=$mipdo->column("SELECT padre FROM padres WHERE id_padre = :id_padre", array("id_padre"=>"50"));
 
 ```
+
+_Resultado almacenado en la variable `$columna` usando `print_r()`_
+```php
+Array
+(
+    [0] => Pascasio Radberto
+)
+```
+_Resultado almacenado en la variable `$columna` representado en una tabla_
+
+<table><th>padre</th><tr><td>Pascasio Radberto</td></tr></table>
 
 #### _c. Una fila en específico_
+Si queremos obtener un fila en específico, podríamos enviar una consulta como esta. También aquí podemos pasar en una sola llamada, mediante el método `row` tanto la instrucción SQL como los parámetros.
 
 ```php
-$fila=$mipdo->row("SELECT * FROM tabla WHERE  id = :id", array("id"=>"1"));
+$fila=$mipdo->row("SELECT id_padre, padre FROM padres WHERE id_padre = :id_padre", array("id_padre"=>"70");
 
 ```
 
+_Resultado almacenado en la variable `$fila` usando `print_r()`_
+```php
+Array
+(
+    [id_padre] => 70
+    [padre] => Alfonso María de Ligorio
+)
+```
+
+_Resultado almacenado en la variable `$fila` representado en una tabla_
+
+<table><th>id_padre</th><th>padre</th><tr><td>70</td><td>Alfonso María de Ligorio</td></tr></table>
 
 ### Continuará
 
