@@ -3,11 +3,11 @@
  *  DB - Clase para Base de Datos usando PDO 
  *
  * @author		A. Cedano
- * @git 		  https://github.com/padrecedano/PHP-PDO
- * @version   1.0
- *
+ * @git 		https://github.com/padrecedano/PHP-PDO
+ * @version      1.1
+ *               En la versión 1.1 se suprime la escritura de errores en un log particular
+ *               Escribiéndolos en el error_log por defecto de php junto con los demás mensajes de error
  */
-require("DbLog.class.php");
 class DbPDO
 {
     # @object, Objeto PDO 
@@ -21,15 +21,12 @@ class DbPDO
 		* Colocar los valores propios de conexión
 	*/
 	private $host="localhost";
-	private $usuario="aquí-nombre-de-usuario-de-la-bd";
-	private $clave="aquí-la-clave";
-	private $dbnombre="aquí-el-nombre-de-la-bd";
-    
+	private $usr="aquí-nombre-de-usuario-de-la-bd";
+	private $pwd="aquí-la-clave";
+	private $dbname="aquí-el-nombre-de-la-bd";
+	    
     # @bool ,  Si conectado a la BD
     private $isConnected = false;
-    
-    # @object, Objeto que registra las excepciones	
-    private $log;
     
     # @array, Parámetros de la consulta SQL
     private $parametros;
@@ -43,47 +40,65 @@ class DbPDO
      */
     public function __construct()
     {
-        $this->log = new DbLog();
-        $this->Conectar();
+        $this->Connect();
         $this->parametros = array();
     }
     
     /**
      *	Este método realiza la conexión a la BD.
      *	
-     *	1. Intenta conectarse a la BD.
-     *	2. Si la conexión falla, despliega una excepción y escribe el mensaje de error en el archivo log creado.
+     *	1. Lee las credenciales de la BD desde un archivo .ini. 
+     *	2. Coloca el contenido del archivo ini en un arreglo (credenciales).
+     *	3. Intenta conectarse a la BD.
+     *	4. Si la conexión falla, despliega una excepción y escribe el mensaje de error en el archivo log creado.
      */
-    private function Conectar()
+    private function Connect()
     {
-        $dsn = 'mysql:dbname=' . $this->dbnombre . ';host=' . $this->host . '';
+        $dsn = 'mysql:dbname=' . $this->dbname . ';host=' . $this->host . '';
+        $pwd = $this->pwd;
+        $usr = $this->usr;
+
+    /**
+     *	El array $options es muy importante para tener un PDO bien configurado
+     *	
+     *	1. PDO::ATTR_PERSISTENT => true: sirve para usar conexiones persistentes
+     *      se puede establecer a false si no se quiere usar este tipo de conexión. Ver: https://es.stackoverflow.com/a/50097/29967 
+     *	2. PDO::ATTR_EMULATE_PREPARES => false: Se usa para desactivar emulación de consultas preparadas 
+     *      forzando el uso real de consultas preparadas. 
+     *      Es muy importante establecerlo a false para prevenir Inyección SQL. Ver: https://es.stackoverflow.com/a/53280/29967
+     *	3. PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION También muy importante para un correcto manejo de las excepciones. 
+     *      Si no se usa bien, cuando hay algún error este se podría escribir en el log revelando datos como la contraseña !!!
+     *	4. PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'": establece el juego de caracteres a utf8, 
+     *      evitando caracteres extraños en pantalla. Ver: https://es.stackoverflow.com/a/59510/29967
+     */
+
+        $options = array(
+            PDO::ATTR_PERSISTENT => true, 
+            PDO::ATTR_EMULATE_PREPARES => false, 
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, 
+            PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'"
+        );
+
         try {
-            # Leer credenciales desde el  archivo ini, set UTF8
-            $this->pdo = new PDO($dsn, $this->usuario, $this->clave, array(
-                PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
-            ));
-            
-            # Registrar excepciones o errores en el fichero log. 
-            $this->pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            
-            # Desactivar emulación de consultas preparadas, uso real de consultas preparadas.
-            $this->pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-            
+			# Intentar la conexión 
+            $this->pdo = new PDO($dsn, $usr, $pwd, $options);
+                       
             # Conexión exitosa, asignar true a la variable booleana isConnected.
             $this->isConnected = true;
         }
         catch (PDOException $e) {
-            # Escribir en el log
-            echo $this->ExceptionLog($e->getMessage());
-            die();
+            # Escribir posibles excepciones en el error_log
+            $this->error = $e->getMessage();
         }
     }
+
     /*
      *   Este método cierra la conexión
      *   No es obligatorio, ya que PHP la cierra cuando termina el script
      *   Ver: http://es.stackoverflow.com/questions/50083/50097#50097
      */
-    public function CerrarConexion()
+
+    public function closeConnection()
     {
         # Setea el objeto PDO a null para cerrar la conexion
         # http://www.php.net/manual/en/pdo.connections.php
@@ -100,11 +115,12 @@ class DbPDO
      *	5. Si ocurre una excepción: Escribirla en el archivo log junto con la consulta.
      *	6. Resetear los parámetros.
      */
+     
     private function Init($sql, $parametros = "")
     {
         # Conecta a la BD
         if (!$this->isConnected) {
-            $this->Connectar();
+            $this->Connect();
         }
         try {
             # Preparar la consulta
@@ -210,6 +226,7 @@ class DbPDO
      *	@param  array  $params
      *	@return array
      */
+     
     public function column($sql, $params = null)
     {
         $this->Init($sql, $params);
@@ -247,7 +264,7 @@ class DbPDO
      *	@param  array  $params
      *	@return string
      */
-    public function simple($sql, $params = null)
+    public function single($sql, $params = null)
     {
         $this->Init($sql, $params);
         $result = $this->sSQL->fetchColumn();
@@ -292,28 +309,5 @@ class DbPDO
         return $this->pdo->rollBack();
     }
     
-
-    /**	
-     * Escribe en el archivo log y devuelve la excepción
-     *
-     * @param  string $mensaje
-     * @param  string $sql
-     * @return string
-     */
-    private function ExceptionLog($mensaje, $sql = "")
-    {
-        $exception = 'Excepción no manejada. <br />';
-        $exception .= $mensaje;
-        $exception .= "<br /> Encontrará el mensaje de error en el log.";
-        
-        if (!empty($sql)) {
-            # Agrega el Raw SQL al Log
-            $mensaje .= "\r\nRaw SQL : " . $sql;
-        }
-        # Write into log
-        $this->log->write($mensaje);
-        
-        return $exception;
-    }
 }
 ?>
