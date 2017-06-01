@@ -85,8 +85,9 @@ class DbPDO
         }
         catch (PDOException $e) {
             # Escribir posibles excepciones en el error_log
-            $this->error = $e->getMessage();
-        }
+	    error_log($this->error = $e->getMessage(),0);
+
+	}
     }
 
     /*
@@ -148,8 +149,7 @@ class DbPDO
         }
         catch (PDOException $e) {
             # Escribe en el archivo log si ocurre un excepción
-            echo $this->ExceptionLog($e->getMessage(), $sql);
-            die();
+            error_log($this->error = $e->getMessage(). "\nSQL: ".$sql."\n",0);
         }
         
         # Resetea los parámetros
