@@ -1,5 +1,15 @@
 # PHP-PDO
-Clase PDO para MySQL
+PHP-PDO es una clase que nos permitirá manejar con suma facilidad todas nuestras operaciones relativas a cualquier base de datos MySQL (u otra) en cualquier aplicación PHP, usando la Clase PDO.
+
+## ¿Por qué una clase dedicada al manejo de la base de datos?
+Esta clase aprovecha varias de las ventajas de la Programación Orientada a Objetos (POO). 
+
+Para poner un ejemplo muy simple: imaginemos una aplicación que en sus orígenes podría ser pequeña y va creciendo con el tiempo, o una aplicación extensa desde sus orígenes. Es posible que en varias partes de esa aplicación necesitemos conectarnos a la base de datos para consultarla, insertar o actualizar datos. ¿Qué pasa si nos conectamos directamente allí donde lo necesitamos, pasándole las credenciales y creando nuestro nuevo objeto conexión? Aparentemente no pasa nada... pero con el tiempo, tendremos por todas partes conexiones así. Pero... ¿qué ocurrirá si se decide cambiar la contraseña de la base de datos? ¡Habrá que ir en busca de todas las partes del código en la que hemos decidido crear nuestro objeto conexión directamente y cambiar la contraseá!, de lo contrario, tendremos errores por todas partes. En cambio, tener una clase de conexión nos permite **tener todo lo relativo a la conexión en un solo lugar**. Cuando sea necesari cambiar algo, sólo tendremos que cambiarlo en ese lugar.
+
+Esto es algo quizá _banal_. Pues pueden ocurrir cosas peores, como que en una de esas muchas partes que creemos nuestro objeto conexión nos olvidemos de algo importante con respecto a la seguridad por ejemplo, y tengamos en nuestra aplicación, por descuido, algunas conexiones que sean inseguras. Tener un único objeto de conexión bien configurado, nos evitará situaciones de ese tipo que podrían ser muy peligrosas.
+
+La POO ofrece otras ventajas, mucho más importantes. Pero no considero necesario ahondar ahora en eso.
+
 ## 1. Configuración previa (a y b)
 
 ### a1. El archivo de credenciales
@@ -12,6 +22,9 @@ Clase PDO para MySQL
 ### b. El archivo de conexión
 Copiar el archivo [DbPDO.class.php](https://github.com/padrecedano/PHP-PDO/blob/master/DbPDO.class.php) en la carpeta que deseemos. Generalmente se suele tener una carpeta dedicada a las clases. Es más fácil luego cargarlas con Autoloader.</p>
 
+
+## 2. Modo y ejemplos de uso
+Nótese que la clase funciona del mismo modo para cualquier tipo de consulta: `SELECT, INSERT, UPDATE, DELETE ...` se trata de escribir en cada caso la consulta preparada y pasar los parámetros usando el estilo que más nos convenga. Aunque los ejemplos citados más abajo se usan con consultas `SELECT`, servirían para los otros tipos de consultas.
 
 ## 2. Modo y ejemplos de uso
 ### a. Incluir el archivo y crear una nueva instancia
