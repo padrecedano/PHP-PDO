@@ -49,7 +49,7 @@ class DbPDO
     private function Connect()
     {
     /* Leer credenciales desde el  archivo ini */
-        $this->credenciales = parse_ini_file("//home3/deiverbu/.credentials/db.php.ini");
+        $this->credenciales = parse_ini_file(".credentials/db.php.ini");
         $dsn = 'mysql:dbname=' . $this->credenciales["dbnombre"] . ';host=' . $this->credenciales["host"] . '';
         $pwd = $this->credenciales["clave"];
 //        $pwd = "123456";
