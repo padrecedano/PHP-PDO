@@ -3,7 +3,7 @@
     "type": "git",
     "description": "Clase para manejo de PDO",
     "keywords": ["php, pdo"],
-    "homepage": "http://www.deiverbum.org",
+    "homepage": "https://github.com/padrecedano/PHP-PDO",
     "license": "Apache-2.0",
     "require": {
         "php": ">=5.4"
@@ -16,7 +16,7 @@
     "repositories": [
         {
             "type": "git",
-            "url": "https://github.com/padrecedano/PHP-PDO"
+            "url": "https://github.com/padrecedano/PHP-PDO.git"
         }
     ]
 
