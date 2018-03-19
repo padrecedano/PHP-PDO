@@ -58,8 +58,9 @@ class DbPDO
     /**
      *	El array $options es muy importante para tener un PDO bien configurado
      *	
-     *	1. PDO::ATTR_PERSISTENT => true: sirve para usar conexiones persistentes
-     *      se puede establecer a false si no se quiere usar este tipo de conexión. Ver: https://es.stackoverflow.com/a/50097/29967 
+     *	1. PDO::ATTR_PERSISTENT => false: sirve para usar conexiones persistentes
+     *      se puede establecer a true si se quiere usar este tipo de conexión. Ver: https://es.stackoverflow.com/a/50097/29967 
+     *      Aunque en la práctica, el uso de conexiones persistentes podría ser problemático
      *	2. PDO::ATTR_EMULATE_PREPARES => false: Se usa para desactivar emulación de consultas preparadas 
      *      forzando el uso real de consultas preparadas. 
      *      Es muy importante establecerlo a false para prevenir Inyección SQL. Ver: https://es.stackoverflow.com/a/53280/29967
@@ -70,7 +71,7 @@ class DbPDO
      */
 
         $options = array(
-            PDO::ATTR_PERSISTENT => true, 
+            PDO::ATTR_PERSISTENT => false, 
             PDO::ATTR_EMULATE_PREPARES => false, 
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, 
             PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES 'utf8'"
